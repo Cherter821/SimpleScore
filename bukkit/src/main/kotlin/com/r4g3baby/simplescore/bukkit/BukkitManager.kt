@@ -23,7 +23,7 @@ import org.bukkit.event.HandlerList
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class BukkitManager(private val plugin: BukkitPlugin) : BaseManager<Player, YamlConfiguration>(plugin) {
+class BukkitManager(val plugin: BukkitPlugin) : BaseManager<Player, YamlConfiguration>(plugin) {
     override val varReplacer = VarReplacer(plugin)
 
     private val trailsAndTailsUpdate3 = ServerVersion.trailsAndTailsUpdate.copy(build = 3)
