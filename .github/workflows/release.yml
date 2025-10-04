@@ -28,35 +28,10 @@ jobs:
       - name: Build with Gradle Wrapper
         run: ./gradlew shadowJar
 
-      - name: Generate Changelog
-        id: generate_changelog
-        run: |
-          git fetch --unshallow --tags
-          tag=$(git tag --sort version:refname | tail -n 2 | head -n 1)
-          changelog=$(git log $tag...HEAD --pretty=format:'- %h %s' --reverse)
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "CHANGELOG<<$EOF" >> $GITHUB_OUTPUT
-          echo "$changelog" >> $GITHUB_OUTPUT
-          echo "$EOF" >> $GITHUB_OUTPUT
-
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Capture release artifacts
+        uses: actions/upload-artifact@v4
         with:
-          body: |
-            ${{ steps.generate_changelog.outputs.CHANGELOG }}
-          files: build/libs/*.jar
-        continue-on-error: false
-
-      - name: Publish Hangar Release
-        env:
-          HANGAR_TOKEN: ${{ secrets.HANGAR_TOKEN }}
-        run: ./gradlew publishPluginPublicationToHangar
-        continue-on-error: true
-
-      - name: Publish Modrinth Release
-        env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: ./gradlew modrinth
-        continue-on-error: true
+          name: =Artifacts
+          path: |
+            build/libs/*.jar
+            !build/libs/*-sources.jar
